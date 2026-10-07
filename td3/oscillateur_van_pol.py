@@ -2,9 +2,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 
-F = 0
 
-def f(t,X,mu,F):
+def f(t,X,mu = 1e-12,F= 0):
     '''
     écriture de l'oscillateur de van de pol
     avec la forme
@@ -14,8 +13,11 @@ def f(t,X,mu,F):
     avec A = [[mu(1-x), -1],[1,0]] et B = [F(t),0]
 
     '''
-    A = np.array([[mu*(1-X)**2,-1],[1,0]])
-    B = [[F,0]]
+    x = X[1]
+    A = np.array([[mu*(1-x)**2,-1],[1,0]])
+
+    F_val = F(t) if callable(F) else F
+    B = np.array([F_val,0])
 
     return np.dot(A,X) + B
 
