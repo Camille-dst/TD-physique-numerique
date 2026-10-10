@@ -50,20 +50,20 @@ def build_advection_diffusion_matrix(c, nu, deltax, N):
     """
     Construit la matrice A pour le schéma en différences finies centré.
     """
-    beta = (c/(2*deltax) + nu/deltax**2)
-    alpha = (-c/(2*deltax) + nu/deltax**2)
-    gamma = nu/deltax**2
+    gamma = (c/(2*deltax) + nu/deltax**2)
+    beta = (-c/(2*deltax) + nu/deltax**2)
+    alpha = nu/deltax**2
 
-    diag_x = [np.ones(beta), -2*np.ones(alpha), np.ones(gamma)]
+    diag_x = [gamma*np.ones(N-1), -2*alpha*np.ones(N), beta*np.ones(N-1)]
     offsets = np.array([-1,0,1])
 
-    A = sp.dia_matrix((diag_x, offsets), shape=(N, N))
+    A = sp.diags(diag_x, offsets, shape=(N, N), format="lil")
 
     # Conditions aux limites périodiques (coins de la matrice)
-    A[0, -1] = alpha
+    A[0, -1] = gamma
     A[-1, 0] = beta
 
-    return A
+    return A.tocsc()
 
 
 def compute_eigenvalues(A, c, nu, deltax, N, deltat):
