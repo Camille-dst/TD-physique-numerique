@@ -11,14 +11,23 @@ import scipy.sparse as sp
 import scipy.sparse.linalg as lg
 import matplotlib.pyplot as plt
 
+pho = 
+v= 
+D =
+mu = 
+
+Re = pho*v*D/mu
 
 def Diffusion_step(u, v):
-    # A compléter (Question 1)
-    ustar = np.zeros((N_x, N_y))
-    vstar = np.zeros((N_x, N_y))
+
+    # A compléter (Question 1). #sur le domaine omega
+    ustar = u.copy()
+    vstar=v.copy()
+
+    ustar[1:-1,1:-1] = u[1:-1,1:-1] + (1/Re)*dt* Laplacian2D(u)  #on exclue les indice O, Nx-1 
+    vstar[1:-1,1:-1] = v[1:-1,1:-1] + (1/Re)*dt* Laplacian2D(v)
 
     return [ustar, vstar]
-
 
 def Laplacian2D(X):
     # Renvoie le Laplacien de X sur [1:-1,1:-1]
@@ -26,11 +35,11 @@ def Laplacian2D(X):
     d2X_dy2 = (X[1:-1, :-2] - 2*X[1:-1, 1:-1] + X[1:-1, 2:]) / dy**2
     return d2X_dx2 + d2X_dy2
 
-
 def Divergence(u, v):
     # Renvoie la divergence de (u,v) sur [1:-1,1:-1]
     div = np.zeros((N_x, N_y))
-    # A compléter (Question 2)
+    div[1:-1,1:-1] = ((u[2:,1:-1] - u[:-2,1:-1]) / (2*dx) + 
+        (v[1:-1,2:] - v[1:-1,:-2]) / (2*dy) )
 
     return div
 
@@ -43,7 +52,12 @@ def buildLaplacianN(L, N):
     n = N - 2
     delta = L / (N - 1)
 
-    # A compléter (Question 3)
+    diag_x = [np.ones(n), -2*np.ones(n), np.ones(n)]
+    diag_x[1][0] = -1 # Coefficient haut gauche de la diagonale
+    diag_x[1][-1] = -1 # Coefficient bas droit de la diagonale
+    #attention à l'ecriute de diag_x car c'est une liste de diagonale
+    offsets = np.array([-1,0,1])
+    LAP = sp.dia_matrix((diag_x,offsets), shape=(n,n))/(delta**2)
 
     return LAP
 
