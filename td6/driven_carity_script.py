@@ -64,7 +64,9 @@ def buildLaplacianN(L, N):
 def Gradient(p):
     gradp_x = np.zeros((N_x, N_y))
     gradp_y = np.zeros((N_x, N_y))
-    # A compléter (Question 5)
+
+    gradp_x[1:-1,:] = (p[2:,:]-p[:-2,:])/(2*dx) #on saute les bords
+    gradp_y[:,1:-1] = (p[:,2:]-p[:,:-2])/(2*dy)
 
     return gradp_x, gradp_y
 
@@ -124,11 +126,21 @@ def VelocityGhostPoints(u, v):
     # A compléter (Question 6)
     ### Bas
 
+    u[:,-1] = - u[:,-2]
+    v[:,-1] = - v[:,-2]
+
     ### Haut
+    u[:,0] = 2*U - u[:,1]
+    v[:,0] = - v[:,1]
 
     ### Droite
+    u[-1,:] = -u[-2,:]
+    v[-1,:] = -v[-2,:]
 
     ### Gauche
+    u[0,:] = -u[1,:]
+    v[0,:] = -v[1,:]
+
 
 
 def PressureGhostPoints(p):
@@ -136,14 +148,15 @@ def PressureGhostPoints(p):
     Conditions de bord de Von Neumman
 
     """
-    # A compléter (Question 7)
-    ### Bas
+    # Bas
+    p[:, 0] = p[:, 1]
+    # Haut
+    p[:, -1] = p[:, -2]
+    # Gauche
+    p[0, :] = p[1, :]
+    # Droite
+    p[-1, :] = p[-2, :]
 
-    ### Haut
-
-    ### Droite
-
-    ### Gauche
 
 
 
