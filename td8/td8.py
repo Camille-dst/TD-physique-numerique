@@ -104,7 +104,7 @@ x = np.linspace(-4, 4, 1000)
 fig, axes = plt.subplots(1, 3, figsize=(15, 4))
 
 for ax, (nom, loi) in zip(axes, lois.items()):
-    echantillon = loi.rvs(size=n). #histogramme
+    echantillon = loi.rvs(size=n) #histogramme
     ax.hist(echantillon, bins=50, density=True, alpha=0.4,
             color="gray", label="histogramme")
 
@@ -124,10 +124,31 @@ plt.show()
 ## chi2
 ##------------------------------
 
+'''
+chi2 sert à comparer un histogramme empirique
+à une densité théorique (test du χ2)
+'''
+k=5
+N_values = np.logspace(1, 6, 50).astype(int)
 
+mean_emp = np.empty_like(N_values,dtype=float)
+var_emp = np.empty_like(N_values,dtype=float)
 
-k = 5      
-Ns = np.logspace(1,6,num=50).astype(int)
+for i,N_i in enumerate(N_values):
+    Z = rng.normal(size=(int(N_i), k))
+    data_chi2 = np.sum(Z**2, axis=1)
+    mean_emp[i] = np.mean(data_chi2)
+    var_emp[i] = np.var(data_chi2)
+
+esp_th, var_th = st.chi2.stats(k, moments='mv')
+plt.figure()
+plt.plot(N_values, mean_emp, "x", color='k', label='mean')
+plt.plot(N_values, var_emp, "x", color='b', label='var')
+plt.axhline(esp_th, color='k')
+plt.axhline(var_th, color='b')
+plt.legend()
+plt.xlabel('Sample size $N$')
+plt.savefig('chi2_mean_var.png', dpi=300)
 
 
 plt.show()
