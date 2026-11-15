@@ -106,6 +106,9 @@ plt.ylim(0,1)
 plt.xlabel('X')
 plt.ylabel('Y')
 plt.gca().set_aspect('equal')
+plt.title('Estimation de $\pi$ par Monte Carlo')
+plt.savefig('valeur_aleaoire_cercle.png')
+plt.show()
 
 
 def estimate_pi(N):
@@ -134,7 +137,8 @@ plt.xscale('log')
 plt.xlabel('$N$')
 plt.legend()
 plt.ylabel('Estimate')
-
+plt.savefig('fig09pi_estimation.png')
+plt.show()
 
 plt.figure()
 plt.plot(N_arr, error_arr, ls='', color='k', marker='x')
@@ -144,6 +148,8 @@ plt.yscale('log')
 plt.legend()
 plt.xlabel('$N$')
 plt.ylabel('Standard deviation')
+plt.savefig('fig09pi_error.png')
+plt.show()
 
 
 
@@ -161,7 +167,8 @@ def method_rectangle_left(f, N, a=0, b=1):
 
 def method_mc(f,N):
     U = rng.uniform(size=N)
-    ## A compléter Q.6
+    out = 1/N * np.sum(f(U))
+    return out
     
 
 err_rect = np.zeros_like(N_arr, dtype=float)
@@ -169,17 +176,16 @@ err_mc = np.zeros_like(N_arr, dtype=float)
 
 for i,n in enumerate(N_arr):
     pass
-    # A completer Q.6 
-
+    err_rect[i] = np.abs(method_rectangle_left(f,n) - np.pi)
+    err_mc[i] = np.sqrt(np.mean([(method_mc(f,n) - np.pi)**2 for k in range(R)]))
 plt.figure()
-## a completer Q.6 
-#plt.loglog(N_arr, err_rect, 'x', color='b',label='Rectangle')
-#plt.loglog(N_arr, err_mc, 'x', color='k',label='MC')
-
-
+plt.loglog(N_arr, err_rect, 'x', color='b',label='Rectangle')
+plt.loglog(N_arr, err_mc, 'x', color='k',label='MC')
 plt.legend()
 plt.xlabel('$N$')
 plt.ylabel('Error')
+plt.title('Deterministic vs Stochastic')
+plt.show()
 
 
 
@@ -191,7 +197,11 @@ def volume_exact(D):
 
 def estimate_volume(N,D):
     X = rng.uniform(low=-1.0, high=1.0, size=(N,D)) 
-    # a completer Q.7
+    ok = np.sum(X**2, axis=1) <= 1
+    n_ok = np.sum(ok)
+    V= 2**D * n_ok/N
+    return V
+
 
 def estimate_volume_grid(N,D): 
     M = round(N**(1./D))
@@ -211,19 +221,20 @@ errors_grid = np.zeros_like(N_arr, dtype=float)
 errors_mc = np.zeros_like(N_arr, dtype=float)
 
 for i,n in enumerate(N_arr):
-    pass    
-    ## a completer Q.8
-
+    errors_mc[i] = np.abs(estimate_volume(n,D) - volume_exact(D))  
+    errors_grid[i] = np.abs(estimate_volume_grid(n,D) - volume_exact(D))  
+    
 idfix = -1
 plt.figure()
-#plt.loglog(N_arr, errors_mc, 'x',color='k', label='MC')
-#plt.loglog(N_arr, errors_mc[idfix] * (N_arr/N_arr[idfix])**-0.5, ls=':', color='k',label=r'$\propto N^{-1/2}$')
-#plt.loglog(N_arr, errors_grid, 'x', color='b',label='Grid')
-#plt.loglog(N_arr, errors_grid[idfix] * (N_arr/N_arr[idfix])**(-1./D), ls='-.', color='b',label=r'$\propto N^{-1/D}$')
-
+plt.loglog(N_arr, errors_mc, 'x',color='k', label='MC')
+plt.loglog(N_arr, errors_mc[idfix] * (N_arr/N_arr[idfix])**-0.5, ls=':', color='k',label=r'$\propto N^{-1/2}$')
+plt.loglog(N_arr, errors_grid, 'x', color='b',label='Grid')
+plt.loglog(N_arr, errors_grid[idfix] * (N_arr/N_arr[idfix])**(-1./D), ls='-.', color='b',label=r'$\propto N^{-1/D}$')
 plt.legend()
 plt.xlabel('$N$ ')
 plt.ylabel('Error')
 plt.title('$D={}$'.format(D))
+plt.savefig('fig09volume.png')
+plt.show()
 
         
